@@ -1,0 +1,15 @@
+// Query to see all unique metric types being sent by Matrix app
+// Run this in InfluxDB Data Explorer
+
+from(bucket: "healthkit")
+  |> range(start: -24h)
+  |> group(columns: ["_measurement", "metric_type"])
+  |> distinct(column: "_measurement")
+  |> keep(columns: ["_measurement", "metric_type"])
+
+// Alternative query to see latest values for each metric type:
+from(bucket: "healthkit")
+  |> range(start: -24h)
+  |> group(columns: ["_measurement", "metric_type"])
+  |> last()
+  |> keep(columns: ["_time", "_measurement", "metric_type", "_value"])
