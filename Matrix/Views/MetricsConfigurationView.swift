@@ -5,20 +5,73 @@ struct MetricsConfigurationView: View {
     @State private var selectedMetrics: Set<String> = []
     
     private let availableMetrics = [
+        // Core activity metrics
         ("healthkit_steps_total", "steps"),
+        ("healthkit_distance_walking_running_meters_total", "distance"),
+        ("healthkit_flights_climbed_total", "flights climbed"),
+        ("healthkit_active_energy_burned_calories_total", "active energy"),
+        ("healthkit_basal_energy_burned_calories_total", "basal energy"),
+        ("healthkit_apple_exercise_time_minutes_total", "exercise time"),
+        ("healthkit_apple_stand_time_minutes_total", "stand time"),
+        
+        // Heart health metrics
         ("healthkit_heart_rate_bpm", "heart rate"),
         ("healthkit_resting_heart_rate_bpm", "resting hr"),
-        ("healthkit_sleep_minutes_total", "sleep"),
-        ("healthkit_active_energy_burned_calories_total", "active energy"),
-        ("healthkit_distance_walking_running_meters_total", "distance"),
-        ("healthkit_basal_energy_burned_calories_total", "basal energy"),
-        ("healthkit_oxygen_saturation_percent", "oxygen saturation"),
+        ("healthkit_walking_heart_rate_average_bpm", "walking hr avg"),
+        ("healthkit_heart_rate_variability_sdnn_ms", "hrv (sdnn)"),
+        ("healthkit_respiratory_rate_bpm", "respiratory rate"),
+        ("healthkit_vo2_max_ml_min_kg", "vo2 max"),
+        
+        // Body metrics
         ("healthkit_body_weight_kg", "weight"),
         ("healthkit_body_mass_index", "BMI"),
         ("healthkit_body_fat_percent", "body fat %"),
+        ("healthkit_oxygen_saturation_percent", "oxygen saturation"),
         ("healthkit_blood_pressure_systolic_mmhg", "blood pressure sys"),
         ("healthkit_blood_pressure_diastolic_mmhg", "blood pressure dia"),
         ("healthkit_blood_glucose_mg_dl", "blood glucose"),
+        
+        // Walking & mobility metrics
+        ("healthkit_walking_speed_mph", "walking speed"),
+        ("healthkit_walking_step_length_inches", "step length"),
+        ("healthkit_walking_double_support_percent", "double support %"),
+        ("healthkit_walking_asymmetry_percent", "walking asymmetry"),
+        ("healthkit_apple_walking_steadiness_percent", "walking steadiness"),
+        ("healthkit_stair_ascent_speed_fps", "stair ascent speed"),
+        ("healthkit_stair_descent_speed_fps", "stair descent speed"),
+        ("healthkit_six_minute_walk_distance_meters", "6min walk distance"),
+        
+        // Audio health metrics
+        ("healthkit_environmental_audio_exposure_db", "environmental audio"),
+        ("healthkit_headphone_audio_exposure_db", "headphone audio"),
+        ("healthkit_environmental_sound_reduction_db", "sound reduction"),
+        
+        // Physical effort
+        ("healthkit_physical_effort_kcal_hr_kg", "physical effort"),
+        
+        // Sleep & wellness
+        ("healthkit_sleep_minutes_total", "sleep"),
+        
+        // Category metrics
+        ("healthkit_apple_stand_hours_total", "stand hours"),
+        ("healthkit_environmental_audio_exposure_events_total", "audio events"),
+        ("healthkit_headphone_audio_exposure_events_total", "headphone events"),
+        
+        // Activity summary metrics
+        ("healthkit_apple_move_time_minutes", "move time"),
+        ("healthkit_apple_move_time_goal_minutes", "move time goal"),
+        ("healthkit_activity_summary_active_energy_burned_calories", "summary: active energy"),
+        ("healthkit_activity_summary_active_energy_burned_goal_calories", "summary: energy goal"),
+        ("healthkit_activity_summary_exercise_time_minutes", "summary: exercise time"),
+        ("healthkit_activity_summary_exercise_time_goal_minutes", "summary: exercise goal"),
+        ("healthkit_activity_summary_stand_hours", "summary: stand hours"),
+        ("healthkit_activity_summary_stand_hours_goal", "summary: stand goal"),
+        
+        // Workout metrics (dynamic based on activity type)
+        ("healthkit_workout_minutes_total", "workout duration"),
+        ("healthkit_workout_calories_total", "workout calories"),
+        
+        // System metrics
         ("healthkit_last_sync_seconds", "last sync")
     ]
     
@@ -34,8 +87,13 @@ struct MetricsConfigurationView: View {
                 // Description
                 descriptionSection
                     .padding(.horizontal, 24)
-                    .padding(.bottom, 32)
-                
+                    .padding(.bottom, 16)
+
+                // Select All / Deselect All buttons
+                selectionButtons
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 16)
+
                 ScrollView {
                     VStack(spacing: 20) {
                         ForEach(availableMetrics, id: \.0) { metric in
@@ -117,36 +175,42 @@ struct MetricsConfigurationView: View {
                             .monospacedFont(size: 12)
                             .foregroundColor(.matrixAccent)
                     }
-                    
-                    HStack {
-                        Spacer()
-                            .frame(width: 28) // Align with text after checkbox
-                        
-                        Spacer()
-                        
-                        // Sparkline
-                        sparkline()
-                            .frame(width: 60, height: 20)
-                    }
                 }
             }
         }
         .buttonStyle(PlainButtonStyle())
     }
-    
-    private func sparkline() -> some View {
-        Path { path in
-            let points = generateSparklinePoints()
-            guard let first = points.first else { return }
-            
-            path.move(to: first)
-            for point in points.dropFirst() {
-                path.addLine(to: point)
+
+    private var selectionButtons: some View {
+        HStack(spacing: 12) {
+            Button(action: selectAll) {
+                Text("select all")
+                    .monospacedFont(size: 12)
+                    .foregroundColor(.matrixPrimaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color.matrixSecondaryText, lineWidth: 1)
+                    )
             }
+            .buttonStyle(PlainButtonStyle())
+
+            Button(action: deselectAll) {
+                Text("deselect all")
+                    .monospacedFont(size: 12)
+                    .foregroundColor(.matrixPrimaryText)
+                    .frame(maxWidth: .infinity)
+                    .padding(.vertical, 12)
+                    .overlay(
+                        Rectangle()
+                            .stroke(Color.matrixSecondaryText, lineWidth: 1)
+                    )
+            }
+            .buttonStyle(PlainButtonStyle())
         }
-        .stroke(Color.matrixSecondaryText, lineWidth: 1.5)
     }
-    
+
     private var doneButton: some View {
         Button(action: saveAndDismiss) {
             Text("Done")
@@ -158,7 +222,15 @@ struct MetricsConfigurationView: View {
                 .cornerRadius(8)
         }
     }
-    
+
+    private func selectAll() {
+        selectedMetrics = Set(availableMetrics.map { $0.0 })
+    }
+
+    private func deselectAll() {
+        selectedMetrics.removeAll()
+    }
+
     private func toggleMetric(_ metricKey: String) {
         if selectedMetrics.contains(metricKey) {
             selectedMetrics.remove(metricKey)
@@ -206,16 +278,4 @@ struct MetricsConfigurationView: View {
         return changes[metricKey] ?? "0%"
     }
     
-    private func generateSparklinePoints() -> [CGPoint] {
-        let width: CGFloat = 60
-        let height: CGFloat = 20
-        var points: [CGPoint] = []
-        
-        for i in 0..<8 {
-            let x = CGFloat(i) * (width / 7)
-            let y = height * CGFloat.random(in: 0.3...0.8)
-            points.append(CGPoint(x: x, y: y))
-        }
-        return points
-    }
 }

@@ -1,0 +1,312 @@
+{
+  "quantity_types": {
+    "HKQuantityTypeIdentifierHeartRate": {
+      "units": [
+        "count/min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 58817
+    },
+    "HKQuantityTypeIdentifierRespiratoryRate": {
+      "units": [
+        "count/min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 25
+    },
+    "HKQuantityTypeIdentifierStepCount": {
+      "units": [
+        "count"
+      ],
+      "sources": [
+        "viveks",
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 5541
+    },
+    "HKQuantityTypeIdentifierDistanceWalkingRunning": {
+      "units": [
+        "mi"
+      ],
+      "sources": [
+        "viveks",
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 24408
+    },
+    "HKQuantityTypeIdentifierBasalEnergyBurned": {
+      "units": [
+        "Cal"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 80815
+    },
+    "HKQuantityTypeIdentifierActiveEnergyBurned": {
+      "units": [
+        "Cal"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 77454
+    },
+    "HKQuantityTypeIdentifierFlightsClimbed": {
+      "units": [
+        "count"
+      ],
+      "sources": [
+        "viveks",
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 489
+    },
+    "HKQuantityTypeIdentifierAppleExerciseTime": {
+      "units": [
+        "min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 5412
+    },
+    "HKQuantityTypeIdentifierRestingHeartRate": {
+      "units": [
+        "count/min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 57
+    },
+    "HKQuantityTypeIdentifierVO2Max": {
+      "units": [
+        "mL/min\u00b7kg"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 25
+    },
+    "HKQuantityTypeIdentifierWalkingHeartRateAverage": {
+      "units": [
+        "count/min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 96
+    },
+    "HKQuantityTypeIdentifierEnvironmentalAudioExposure": {
+      "units": [
+        "dBASPL"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 1188
+    },
+    "HKQuantityTypeIdentifierHeadphoneAudioExposure": {
+      "units": [
+        "dBASPL"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 6938
+    },
+    "HKQuantityTypeIdentifierWalkingDoubleSupportPercentage": {
+      "units": [
+        "%"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 2991
+    },
+    "HKQuantityTypeIdentifierSixMinuteWalkTestDistance": {
+      "units": [
+        "m"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 1
+    },
+    "HKQuantityTypeIdentifierAppleStandTime": {
+      "units": [
+        "min"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 3437
+    },
+    "HKQuantityTypeIdentifierWalkingSpeed": {
+      "units": [
+        "mi/hr"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 3199
+    },
+    "HKQuantityTypeIdentifierWalkingStepLength": {
+      "units": [
+        "in"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 3199
+    },
+    "HKQuantityTypeIdentifierWalkingAsymmetryPercentage": {
+      "units": [
+        "%"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 1997
+    },
+    "HKQuantityTypeIdentifierStairAscentSpeed": {
+      "units": [
+        "ft/s"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 286
+    },
+    "HKQuantityTypeIdentifierStairDescentSpeed": {
+      "units": [
+        "ft/s"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 278
+    },
+    "HKQuantityTypeIdentifierAppleWalkingSteadiness": {
+      "units": [
+        "%"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 19
+    },
+    "HKQuantityTypeIdentifierEnvironmentalSoundReduction": {
+      "units": [
+        "dBASPL"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 472
+    },
+    "HKQuantityTypeIdentifierPhysicalEffort": {
+      "units": [
+        "kcal/hr\u00b7kg"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 29680
+    },
+    "HKQuantityTypeIdentifierHeartRateVariabilitySDNN": {
+      "units": [
+        "ms"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 210
+    }
+  },
+  "category_types": {
+    "HKCategoryTypeIdentifierAppleStandHour": {
+      "values": [
+        "HKCategoryValueAppleStandHourIdle",
+        "HKCategoryValueAppleStandHourStood"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 657
+    },
+    "HKCategoryTypeIdentifierAudioExposureEvent": {
+      "values": [
+        "HKCategoryValueEnvironmentalAudioExposureEventMomentaryLimit"
+      ],
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 16
+    },
+    "HKCategoryTypeIdentifierHeadphoneAudioExposureEvent": {
+      "values": [
+        "HKCategoryValueHeadphoneAudioExposureEventSevenDayLimit"
+      ],
+      "sources": [
+        "viveks"
+      ],
+      "count": 9
+    }
+  },
+  "workout_types": {
+    "HKWorkoutActivityTypeTraditionalStrengthTraining": {
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 41,
+      "duration_unit": [
+        "min"
+      ],
+      "distance_unit": [],
+      "energy_unit": []
+    },
+    "HKWorkoutActivityTypeFunctionalStrengthTraining": {
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 1,
+      "duration_unit": [
+        "min"
+      ],
+      "distance_unit": [],
+      "energy_unit": []
+    },
+    "HKWorkoutActivityTypeWalking": {
+      "sources": [
+        "Vivek\u2019s Apple\u00a0Watch"
+      ],
+      "count": 11,
+      "duration_unit": [
+        "min"
+      ],
+      "distance_unit": [],
+      "energy_unit": []
+    }
+  },
+  "activity_summary": {
+    "fields": [
+      "appleMoveTime",
+      "appleMoveTimeGoal",
+      "activeEnergyBurnedUnit",
+      "activeEnergyBurned",
+      "appleExerciseTime",
+      "dateComponents",
+      "activeEnergyBurnedGoal",
+      "appleStandHoursGoal",
+      "appleExerciseTimeGoal",
+      "appleStandHours"
+    ],
+    "count": 133
+  }
+}

@@ -8,7 +8,8 @@ struct MetricsOverviewView: View {
     @State private var improvingCount = 0
     @State private var trackedCount = 0
     @State private var lastSyncTime: Date?
-    
+    @State private var showAllMetrics = false
+
     private let healthKitManager = HealthKitManager.shared
     
     var body: some View {
@@ -65,10 +66,18 @@ struct MetricsOverviewView: View {
             
             Spacer()
             
-            Button(action: { showConfiguration = true }) {
-                Image(systemName: "gearshape")
-                    .font(.system(size: 18))
-                    .foregroundColor(.matrixPrimaryText)
+            HStack(spacing: 16) {
+                Button(action: { showAllMetrics.toggle() }) {
+                    Text(showAllMetrics ? "selected" : "all")
+                        .monospacedFont(size: 12)
+                        .foregroundColor(.matrixAccent)
+                }
+
+                Button(action: { showConfiguration = true }) {
+                    Image(systemName: "gearshape")
+                        .font(.system(size: 18))
+                        .foregroundColor(.matrixPrimaryText)
+                }
             }
         }
         .padding(.horizontal, 24)
@@ -123,8 +132,37 @@ struct MetricsOverviewView: View {
     
     private var metricsSection: some View {
         VStack(spacing: 24) {
-            ForEach(getSelectedMetrics(), id: \.name) { metric in
-                metricRow(metric)
+            let selectedMetrics = getSelectedMetrics()
+
+            if selectedMetrics.isEmpty {
+                VStack(spacing: 16) {
+                    Text("No metrics available yet")
+                        .monospacedFont(size: 14)
+                        .foregroundColor(.matrixSecondaryText)
+
+                    Text("Debug: \(metrics.count) total metrics collected")
+                        .monospacedFont(size: 12)
+                        .foregroundColor(.matrixSecondaryText.opacity(0.7))
+
+                    Button(action: {
+                        loadMetrics()
+                    }) {
+                        Text("Refresh Metrics")
+                            .monospacedFont(size: 12)
+                            .foregroundColor(.matrixAccent)
+                            .padding(.horizontal, 16)
+                            .padding(.vertical, 8)
+                            .overlay(
+                                Rectangle()
+                                    .stroke(Color.matrixAccent, lineWidth: 1)
+                            )
+                    }
+                }
+                .padding(.vertical, 40)
+            } else {
+                ForEach(selectedMetrics, id: \.name) { metric in
+                    metricRow(metric)
+                }
             }
         }
     }
@@ -153,36 +191,18 @@ struct MetricsOverviewView: View {
                         Text(formatMetricValue(metric))
                             .monospacedFont(size: 20, weight: .medium)
                             .foregroundColor(.matrixPrimaryText)
-                        
+
                         Text(formatTimeAgo(Date()))
                             .monospacedFont(size: 10)
                             .foregroundColor(.matrixSecondaryText)
                     }
-                    
+
                     Spacer()
-                    
-                    // Sparkline placeholder
-                    sparkline()
-                        .frame(width: 60, height: 20)
                 }
             }
         }
     }
-    
-    private func sparkline() -> some View {
-        // Simple sparkline representation
-        Path { path in
-            let points = generateSparklinePoints()
-            guard let first = points.first else { return }
-            
-            path.move(to: first)
-            for point in points.dropFirst() {
-                path.addLine(to: point)
-            }
-        }
-        .stroke(Color.matrixSecondaryText, lineWidth: 1.5)
-    }
-    
+
     private var footer: some View {
         HStack {
             HStack(spacing: 8) {
@@ -206,10 +226,30 @@ struct MetricsOverviewView: View {
     }
     
     private func loadMetrics() {
+        Logger.shared.log("MetricsOverviewView: Loading metrics...", level: .info)
+
+        // First try to load from cache immediately
+        if let cachedMetrics = MetricCache.shared.getCachedMetrics() {
+            let healthMetrics = cachedMetrics.map { $0.metric }
+            Logger.shared.log("MetricsOverviewView: Loaded \(healthMetrics.count) cached metrics", level: .info)
+            self.metrics = healthMetrics
+            self.trackedCount = getSelectedMetrics().count
+            self.improvingCount = calculateImprovingCount()
+            self.lastSyncTime = cachedMetrics.first?.timestamp
+        }
+
+        // Then fetch fresh data in background
         Task {
             do {
+                // Check if HealthKit is authorized
+                guard healthKitManager.authorizationStatus() == "Authorized" else {
+                    Logger.shared.log("MetricsOverviewView: HealthKit not authorized", level: .warning)
+                    return
+                }
+
                 let todayMetrics = try await healthKitManager.collectAllMetrics()
-                
+                Logger.shared.log("MetricsOverviewView: Collected \(todayMetrics.count) fresh metrics", level: .info)
+
                 await MainActor.run {
                     self.metrics = todayMetrics
                     self.trackedCount = getSelectedMetrics().count
@@ -217,12 +257,23 @@ struct MetricsOverviewView: View {
                     self.lastSyncTime = Date()
                 }
             } catch {
-                print("Failed to load metrics: \(error)")
+                Logger.shared.log("MetricsOverviewView: Failed to load metrics: \(error)", level: .error)
+
+                await MainActor.run {
+                    // Keep cached metrics if fresh fetch fails
+                    if self.metrics.isEmpty {
+                        self.trackedCount = 0
+                        self.improvingCount = 0
+                    }
+                }
             }
         }
     }
     
     private func getSelectedMetrics() -> [HealthMetric] {
+        if showAllMetrics {
+            return metrics
+        }
         let selectedMetricNames = getSelectedMetricNames()
         return metrics.filter { selectedMetricNames.contains($0.name) }
     }
@@ -269,6 +320,13 @@ struct MetricsOverviewView: View {
         case "healthkit_blood_pressure_systolic_mmhg": return "blood pressure sys"
         case "healthkit_blood_pressure_diastolic_mmhg": return "blood pressure dia"
         case "healthkit_blood_glucose_mg_dl": return "blood glucose"
+        case "healthkit_walking_speed_ms": return "walking speed"
+        case "healthkit_walking_step_length_meters": return "step length"
+        case "healthkit_walking_double_support_percent": return "double support %"
+        case "healthkit_walking_asymmetry_percent": return "walking asymmetry"
+        case "healthkit_stair_ascent_speed_ms": return "stair ascent speed"
+        case "healthkit_stair_descent_speed_ms": return "stair descent speed"
+        case "healthkit_six_minute_walk_distance_meters": return "6min walk distance"
         case "healthkit_last_sync_seconds": return "last sync"
         default: return name.replacingOccurrences(of: "healthkit_", with: "").replacingOccurrences(of: "_", with: " ")
         }
@@ -276,28 +334,90 @@ struct MetricsOverviewView: View {
     
     private func formatMetricValue(_ metric: HealthMetric) -> String {
         switch metric.name {
+        // Core activity metrics
         case "healthkit_steps_total":
             return String(format: "%.0f", metric.value)
-        case "healthkit_heart_rate_bpm", "healthkit_resting_heart_rate_bpm":
-            return "\(Int(metric.value))"
-        case "healthkit_sleep_minutes_total":
+        case "healthkit_flights_climbed_total":
+            return String(format: "%.0f", metric.value)
+        case "healthkit_distance_walking_running_meters_total", "healthkit_six_minute_walk_distance_meters":
+            return String(format: "%.1f km", metric.value / 1000)
+        case "healthkit_active_energy_burned_calories_total", "healthkit_basal_energy_burned_calories_total":
+            return String(format: "%.0f kcal", metric.value)
+        case "healthkit_apple_exercise_time_minutes_total", "healthkit_apple_stand_time_minutes_total":
             let hours = Int(metric.value / 60)
             let minutes = Int(metric.value.truncatingRemainder(dividingBy: 60))
             return "\(hours)h \(minutes)m"
-        case "healthkit_active_energy_burned_calories_total", "healthkit_basal_energy_burned_calories_total":
-            return String(format: "%.0f", metric.value)
-        case "healthkit_distance_walking_running_meters_total":
-            return String(format: "%.1f", metric.value / 1000) // Convert to km
-        case "healthkit_oxygen_saturation_percent", "healthkit_body_fat_percent":
-            return String(format: "%.1f%%", metric.value * 100)
+            
+        // Heart health metrics
+        case "healthkit_heart_rate_bpm", "healthkit_resting_heart_rate_bpm", "healthkit_walking_heart_rate_average_bpm", "healthkit_respiratory_rate_bpm":
+            return "\(Int(metric.value)) bpm"
+        case "healthkit_heart_rate_variability_sdnn_ms":
+            return String(format: "%.1f ms", metric.value)
+        case "healthkit_vo2_max_ml_min_kg":
+            return String(format: "%.1f mL/kg/min", metric.value)
+            
+        // Body metrics
         case "healthkit_body_weight_kg":
             return String(format: "%.1f kg", metric.value)
         case "healthkit_body_mass_index":
             return String(format: "%.1f", metric.value)
+        case "healthkit_oxygen_saturation_percent", "healthkit_body_fat_percent", 
+             "healthkit_walking_double_support_percent", "healthkit_walking_asymmetry_percent", 
+             "healthkit_apple_walking_steadiness_percent":
+            return String(format: "%.1f%%", metric.value * 100)
         case "healthkit_blood_pressure_systolic_mmhg", "healthkit_blood_pressure_diastolic_mmhg":
-            return String(format: "%.0f", metric.value)
+            return String(format: "%.0f mmHg", metric.value)
         case "healthkit_blood_glucose_mg_dl":
+            return String(format: "%.0f mg/dL", metric.value)
+            
+        // Walking & mobility metrics
+        case "healthkit_walking_speed_mph":
+            return String(format: "%.1f mph", metric.value)
+        case "healthkit_walking_step_length_inches":
+            return String(format: "%.1f in", metric.value)
+        case "healthkit_stair_ascent_speed_fps", "healthkit_stair_descent_speed_fps":
+            return String(format: "%.2f ft/s", metric.value)
+            
+        // Audio health metrics
+        case "healthkit_environmental_audio_exposure_db", "healthkit_headphone_audio_exposure_db", 
+             "healthkit_environmental_sound_reduction_db":
+            return String(format: "%.1f dB", metric.value)
+            
+        // Physical effort
+        case "healthkit_physical_effort_kcal_hr_kg":
+            return String(format: "%.1f", metric.value)
+            
+        // Sleep
+        case "healthkit_sleep_minutes_total":
+            let hours = Int(metric.value / 60)
+            let minutes = Int(metric.value.truncatingRemainder(dividingBy: 60))
+            return "\(hours)h \(minutes)m"
+            
+        // Category metrics (counts)
+        case "healthkit_apple_stand_hours_total", "healthkit_environmental_audio_exposure_events_total", 
+             "healthkit_headphone_audio_exposure_events_total":
             return String(format: "%.0f", metric.value)
+            
+        // Activity summary metrics
+        case "healthkit_apple_move_time_minutes", "healthkit_apple_move_time_goal_minutes",
+             "healthkit_activity_summary_exercise_time_minutes", "healthkit_activity_summary_exercise_time_goal_minutes":
+            let hours = Int(metric.value / 60)
+            let minutes = Int(metric.value.truncatingRemainder(dividingBy: 60))
+            return "\(hours)h \(minutes)m"
+        case "healthkit_activity_summary_active_energy_burned_calories", "healthkit_activity_summary_active_energy_burned_goal_calories":
+            return String(format: "%.0f kcal", metric.value)
+        case "healthkit_activity_summary_stand_hours", "healthkit_activity_summary_stand_hours_goal":
+            return String(format: "%.0f hrs", metric.value)
+            
+        // Workout metrics
+        case "healthkit_workout_minutes_total":
+            let hours = Int(metric.value / 60)
+            let minutes = Int(metric.value.truncatingRemainder(dividingBy: 60))
+            return "\(hours)h \(minutes)m"
+        case "healthkit_workout_calories_total":
+            return String(format: "%.0f kcal", metric.value)
+            
+        // System metrics
         case "healthkit_last_sync_seconds":
             let seconds = Int(metric.value)
             if seconds < 60 {
@@ -309,6 +429,7 @@ struct MetricsOverviewView: View {
             } else {
                 return "\(seconds / 86400)d"
             }
+            
         default:
             return String(format: "%.1f", metric.value)
         }
@@ -320,12 +441,14 @@ struct MetricsOverviewView: View {
         case "healthkit_heart_rate_bpm", "healthkit_resting_heart_rate_bpm": return "bpm"
         case "healthkit_sleep_minutes_total": return "hours"
         case "healthkit_active_energy_burned_calories_total", "healthkit_basal_energy_burned_calories_total": return "kcal"
-        case "healthkit_distance_walking_running_meters_total": return "km"
-        case "healthkit_oxygen_saturation_percent", "healthkit_body_fat_percent": return "%"
+        case "healthkit_distance_walking_running_meters_total", "healthkit_six_minute_walk_distance_meters": return "km"
+        case "healthkit_oxygen_saturation_percent", "healthkit_body_fat_percent", "healthkit_walking_double_support_percent", "healthkit_walking_asymmetry_percent": return "%"
         case "healthkit_body_weight_kg": return "kg"
         case "healthkit_body_mass_index": return ""
         case "healthkit_blood_pressure_systolic_mmhg", "healthkit_blood_pressure_diastolic_mmhg": return "mmHg"
         case "healthkit_blood_glucose_mg_dl": return "mg/dL"
+        case "healthkit_walking_speed_ms", "healthkit_stair_ascent_speed_ms", "healthkit_stair_descent_speed_ms": return "m/s"
+        case "healthkit_walking_step_length_meters": return "cm"
         case "healthkit_last_sync_seconds": return "ago"
         default: return ""
         }
@@ -336,20 +459,6 @@ struct MetricsOverviewView: View {
         let changes = ["+15%", "-4%", "-2%", "+3%", "+12%", "+5%", "0%", "-13%"]
         let index = abs(metric.name.hashValue) % changes.count
         return changes[index]
-    }
-    
-    private func generateSparklinePoints() -> [CGPoint] {
-        // Generate simple sparkline data
-        let width: CGFloat = 60
-        let height: CGFloat = 20
-        var points: [CGPoint] = []
-        
-        for i in 0..<8 {
-            let x = CGFloat(i) * (width / 7)
-            let y = height * CGFloat.random(in: 0.3...0.8)
-            points.append(CGPoint(x: x, y: y))
-        }
-        return points
     }
     
     private func formatCurrentTime() -> String {

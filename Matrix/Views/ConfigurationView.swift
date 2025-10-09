@@ -19,7 +19,7 @@ struct ConfigurationView: View {
     @State private var testingConnection = false
     @State private var showInfluxDBToken = false
     @State private var showPrometheusPassword = false
-    
+
     private let keychainManager = KeychainManager.shared
     
     enum DataSource {
@@ -57,7 +57,7 @@ struct ConfigurationView: View {
                         
                         // Push Interval
                         pushIntervalSection
-                        
+
                         // Connection Test
                         connectionTestSection
                         
@@ -240,7 +240,7 @@ struct ConfigurationView: View {
         }
         .padding(.top, 12)
     }
-    
+
     private var connectionTestSection: some View {
         VStack(spacing: 16) {
             Button(action: testConnection) {

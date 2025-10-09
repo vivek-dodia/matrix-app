@@ -1,0 +1,16 @@
+{
+  "name": "matrix-health-backend",
+  "version": "1.0.0",
+  "description": "Serverless backend for Matrix Health AI chat",
+  "main": "api/chat.ts",
+  "scripts": {
+    "dev": "vercel dev"
+  },
+  "dependencies": {
+    "@vercel/node": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

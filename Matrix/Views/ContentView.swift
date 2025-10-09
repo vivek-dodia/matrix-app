@@ -24,6 +24,7 @@ struct ContentView: View {
     @State private var showConfiguration = false
     @State private var showLogs = false
     @State private var showMetricsOverview = false
+    @State private var showBabbleChat = false
     @State private var authorizationStatus = "Not Checked"
     @State private var isLoading = false
     @State private var testResult = ""
@@ -82,6 +83,9 @@ struct ContentView: View {
         }
         .sheet(isPresented: $showMetricsOverview) {
             MetricsOverviewView()
+        }
+        .sheet(isPresented: $showBabbleChat) {
+            BabbleChatView()
         }
         .onAppear {
             checkHealthKitAuthorization()
@@ -151,7 +155,29 @@ struct ContentView: View {
                 .frame(width: 64, height: 64)
                 .scaleEffect(centralCircleScale())
                 .onTapGesture {
-                    showMetricsOverview = true
+                    // Force collect metrics before showing
+                    if appState.isHealthKitAuthorized {
+                        Task {
+                            do {
+                                logger.log("Manually collecting metrics...", level: .info)
+                                let metrics = try await healthKitManager.collectAllMetrics()
+                                logger.log("Collected \(metrics.count) metrics", level: .info)
+
+                                await MainActor.run {
+                                    metricsCount = metrics.count
+                                    updateMetricsCount()
+                                    showMetricsOverview = true
+                                }
+                            } catch {
+                                logger.log("Failed to collect metrics: \(error)", level: .error)
+                                await MainActor.run {
+                                    showMetricsOverview = true
+                                }
+                            }
+                        }
+                    } else {
+                        showMetricsOverview = true
+                    }
                 }
         }
         .frame(width: 256, height: 256)
@@ -279,43 +305,89 @@ struct ContentView: View {
             .buttonStyle(PlainButtonStyle())
             
             Spacer()
-            
-            // Configure button
-            Button(action: { 
-                if !appState.isHealthKitAuthorized {
-                    setupApp()
-                } else {
-                    showConfiguration = true
+
+            // Babble and Configure buttons
+            HStack(spacing: 12) {
+                // Babble button
+                Button(action: {
+                    showBabbleChat = true
+                }) {
+                    Text("Babble")
+                        .monospacedFont(size: 14, weight: .medium)
+                        .foregroundColor(.matrixPrimaryText)
+                        .padding(.horizontal, 20)
+                        .padding(.vertical, 12)
+                        .overlay(
+                            RoundedRectangle(cornerRadius: 8)
+                                .stroke(Color.matrixAccent, lineWidth: 2)
+                        )
                 }
-            }) {
-                Text(appState.isHealthKitAuthorized ? "Configure" : "Authorize")
-                    .monospacedFont(size: 14, weight: .medium)
-                    .foregroundColor(.matrixBackground)
-                    .padding(.horizontal, 24)
-                    .padding(.vertical, 12)
-                    .background(Color.matrixAccent)
-                    .cornerRadius(8)
+                .disabled(!appState.isHealthKitAuthorized)
+                .opacity(appState.isHealthKitAuthorized ? 1.0 : 0.5)
+
+                // Configure button
+                Button(action: {
+                    if !appState.isHealthKitAuthorized {
+                        setupApp()
+                    } else {
+                        showConfiguration = true
+                    }
+                }) {
+                    Text(appState.isHealthKitAuthorized ? "Configure" : "Authorize")
+                        .monospacedFont(size: 14, weight: .medium)
+                        .foregroundColor(.matrixBackground)
+                        .padding(.horizontal, 24)
+                        .padding(.vertical, 12)
+                        .background(Color.matrixAccent)
+                        .cornerRadius(8)
+                }
             }
         }
     }
     
     private func setupApp() {
         isLoading = true
-        
+        logger.log("Starting HealthKit authorization", level: .info)
+
         healthKitManager.requestAuthorization { success, error in
             DispatchQueue.main.async {
+                self.isLoading = false
+
+                if let error = error {
+                    self.logger.log("HealthKit authorization error: \(error.localizedDescription)", level: .error)
+                    self.authorizationStatus = "Error"
+                    self.appState.isHealthKitAuthorized = false
+                    return
+                }
+
                 if success {
+                    self.logger.log("HealthKit authorization successful", level: .info)
                     self.authorizationStatus = "Authorized"
                     self.appState.isHealthKitAuthorized = true
-                    
+
+                    // Trigger immediate metric collection
+                    Task {
+                        do {
+                            let metrics = try await self.healthKitManager.collectAllMetrics()
+                            self.logger.log("Collected \(metrics.count) metrics after authorization", level: .info)
+
+                            await MainActor.run {
+                                self.metricsCount = metrics.count
+                                self.updateMetricsCount()
+                            }
+                        } catch {
+                            self.logger.log("Failed to collect initial metrics: \(error)", level: .error)
+                        }
+                    }
+
                     if !self.appState.isConfigured {
                         self.showConfiguration = true
                     }
                 } else {
+                    self.logger.log("HealthKit authorization denied", level: .warning)
                     self.authorizationStatus = "Denied"
                     self.appState.isHealthKitAuthorized = false
                 }
-                self.isLoading = false
             }
         }
     }

@@ -23,7 +23,9 @@
 		1A1B2C572A1B2C3D00123456 /* MetricCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = 1A1B2C562A1B2C3D00123456 /* MetricCache.swift */; };
 		E2C4A6482E1304B500D2E39A /* MetricsOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C4A6472E1304B500D2E39A /* MetricsOverviewView.swift */; };
 		E2C4A6492E1304B500D2E39A /* MetricsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C4A6462E1304B500D2E39A /* MetricsConfigurationView.swift */; };
-/* End PBXBuildFile section */
+		BB98765432FEDCBA98765432 /* BabbleChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB01234567890ABCDEF12345 /* BabbleChatView.swift */; };
+		CC98765432FEDCBA98765432 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01234567890ABCDEF12345 /* ClaudeService.swift */; };
+		/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
 		1A1B2C392A1B2C3D00123456 /* Matrix.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Matrix.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -46,7 +48,9 @@
 		1A1B2C5A2A1B2C3D00123456 /* Matrix.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = Matrix.entitlements; sourceTree = "<group>"; };
 		E2C4A6462E1304B500D2E39A /* MetricsConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsConfigurationView.swift; sourceTree = "<group>"; };
 		E2C4A6472E1304B500D2E39A /* MetricsOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsOverviewView.swift; sourceTree = "<group>"; };
-/* End PBXFileReference section */
+		BB01234567890ABCDEF12345 /* BabbleChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabbleChatView.swift; sourceTree = "<group>"; };
+		CC01234567890ABCDEF12345 /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
+		/* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		1A1B2C362A1B2C3D00123456 /* Frameworks */ = {
@@ -106,6 +110,7 @@
 				1A1B2C3E2A1B2C3D00123456 /* ContentView.swift */,
 				1A1B2C402A1B2C3D00123456 /* ConfigurationView.swift */,
 				1A1B2C422A1B2C3D00123456 /* LogView.swift */,
+				BB01234567890ABCDEF12345 /* BabbleChatView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
@@ -121,6 +126,7 @@
 				1A1B2C4E2A1B2C3D00123456 /* NotificationManager.swift */,
 				1A1B2C502A1B2C3D00123456 /* Logger.swift */,
 				1A1B2C562A1B2C3D00123456 /* MetricCache.swift */,
+				CC01234567890ABCDEF12345 /* ClaudeService.swift */,
 			);
 			path = Services;
 			sourceTree = "<group>";
@@ -217,7 +223,9 @@
 				1A1B2C532A1B2C3D00123456 /* Color+Extensions.swift in Sources */,
 				1A1B2C552A1B2C3D00123456 /* AppState.swift in Sources */,
 				1A1B2C572A1B2C3D00123456 /* MetricCache.swift in Sources */,
-			);
+							BB98765432FEDCBA98765432 /* BabbleChatView.swift in Sources */,
+				CC98765432FEDCBA98765432 /* ClaudeService.swift in Sources */,
+);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */

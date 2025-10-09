@@ -51,35 +51,35 @@ class BackgroundTaskManager {
     
     private func handleHealthRefresh(task: BGAppRefreshTask) {
         scheduleBackgroundRefresh() // Schedule next refresh
-        
+
         let pushService = PrometheussPushService.shared
-        
+
         Task {
             do {
                 try await pushService.pushMetricsOnce()
-                
+
                 // Send success notification
                 await NotificationManager.shared.sendStatusNotification(
                     title: "Matrix Health Data",
                     body: "Successfully pushed metrics",
                     isSuccess: true
                 )
-                
+
                 task.setTaskCompleted(success: true)
             } catch {
                 Logger.shared.log("Background refresh failed: \(error)", level: .error)
-                
+
                 // Send failure notification
                 await NotificationManager.shared.sendStatusNotification(
                     title: "Matrix Health Data",
                     body: "Push failed: \(error.localizedDescription)",
                     isSuccess: false
                 )
-                
+
                 task.setTaskCompleted(success: false)
             }
         }
-        
+
         // Set expiration handler
         task.expirationHandler = {
             Logger.shared.log("Background refresh task expired", level: .warning)

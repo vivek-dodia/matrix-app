@@ -81,7 +81,7 @@ class PrometheussPushService {
         
         // Push to appropriate endpoint with retry logic
         if useInfluxDB {
-            let influxData = convertToInfluxLineProtocol(metrics: metrics)
+            let influxData = await convertToInfluxLineProtocol(metrics: metrics)
             try await pushToInfluxDBWithRetry(url: targetURL, data: influxData)
         } else {
             let formattedMetrics = PrometheusFormatter.format(metrics: metrics)
@@ -121,7 +121,7 @@ class PrometheussPushService {
     }
     
     private func pushToGateway(url: String, metrics: String) async throws {
-        let instanceName = UIDevice.current.name
+        let instanceName = await UIDevice.current.name
             .replacingOccurrences(of: " ", with: "_")
             .replacingOccurrences(of: "'", with: "")
             .replacingOccurrences(of: "\"", with: "")
@@ -238,19 +238,20 @@ class PrometheussPushService {
         }
     }
     
-    private func convertToInfluxLineProtocol(metrics: [HealthMetric]) -> String {
+    private func convertToInfluxLineProtocol(metrics: [HealthMetric]) async -> String {
         var lines: [String] = []
         let timestamp = Int64(Date().timeIntervalSince1970 * 1000) // milliseconds
-        
+        let deviceName = await UIDevice.current.name.replacingOccurrences(of: " ", with: "_")
+
         for metric in metrics {
             // Convert Prometheus format to InfluxDB line protocol
             // Format: measurement,tag1=value1,tag2=value2 field1=value1,field2=value2 timestamp
-            
+
             let measurementName = metric.name.replacingOccurrences(of: ".", with: "_")
-            
+
             // Add device tags
             var tags = [
-                "device=\(UIDevice.current.name.replacingOccurrences(of: " ", with: "_"))",
+                "device=\(deviceName)",
                 "job=my_health_data"
             ]
             

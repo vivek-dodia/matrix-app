@@ -120,7 +120,7 @@ class KeychainManager {
             kSecAttrService as String: serviceName,
             kSecAttrAccount as String: influxDBAccountName
         ]
-        
+
         SecItemDelete(query as CFDictionary)
     }
 }
