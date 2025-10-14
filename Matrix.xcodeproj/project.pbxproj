@@ -25,6 +25,12 @@
 		E2C4A6492E1304B500D2E39A /* MetricsConfigurationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = E2C4A6462E1304B500D2E39A /* MetricsConfigurationView.swift */; };
 		BB98765432FEDCBA98765432 /* BabbleChatView.swift in Sources */ = {isa = PBXBuildFile; fileRef = BB01234567890ABCDEF12345 /* BabbleChatView.swift */; };
 		CC98765432FEDCBA98765432 /* ClaudeService.swift in Sources */ = {isa = PBXBuildFile; fileRef = CC01234567890ABCDEF12345 /* ClaudeService.swift */; };
+		DD98765432FEDCBA98765432 /* InsightsOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD01234567890ABCDEF12345 /* InsightsOverviewView.swift */; };
+		EE98765432FEDCBA98765432 /* MetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */; };
+		EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSettingsView.swift; sourceTree = "<group>"; };
+		DD98765432FEDCBA98765432 /* InsightsOverviewView.swift in Sources */ = {isa = PBXBuildFile; fileRef = DD01234567890ABCDEF12345 /* InsightsOverviewView.swift */; };
+		EE98765432FEDCBA98765432 /* MetricsSettingsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */; };
+		EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSettingsView.swift; sourceTree = "<group>"; };
 		/* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -49,6 +55,8 @@
 		E2C4A6462E1304B500D2E39A /* MetricsConfigurationView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsConfigurationView.swift; sourceTree = "<group>"; };
 		E2C4A6472E1304B500D2E39A /* MetricsOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsOverviewView.swift; sourceTree = "<group>"; };
 		BB01234567890ABCDEF12345 /* BabbleChatView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BabbleChatView.swift; sourceTree = "<group>"; };
+		DD01234567890ABCDEF12345 /* InsightsOverviewView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InsightsOverviewView.swift; sourceTree = "<group>"; };
+		EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSettingsView.swift; sourceTree = "<group>"; };
 		CC01234567890ABCDEF12345 /* ClaudeService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ClaudeService.swift; sourceTree = "<group>"; };
 		/* End PBXFileReference section */
 
@@ -111,10 +119,13 @@
 				1A1B2C402A1B2C3D00123456 /* ConfigurationView.swift */,
 				1A1B2C422A1B2C3D00123456 /* LogView.swift */,
 				BB01234567890ABCDEF12345 /* BabbleChatView.swift */,
+				DD01234567890ABCDEF12345 /* InsightsOverviewView.swift */,
+				EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */,
 			);
 			path = Views;
 			sourceTree = "<group>";
 		};
+		EE01234567890ABCDEF12345 /* MetricsSettingsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MetricsSettingsView.swift; sourceTree = "<group>"; };
 		1A1B2C5D2A1B2C3D00123456 /* Services */ = {
 			isa = PBXGroup;
 			children = (
@@ -225,6 +236,8 @@
 				1A1B2C572A1B2C3D00123456 /* MetricCache.swift in Sources */,
 							BB98765432FEDCBA98765432 /* BabbleChatView.swift in Sources */,
 				CC98765432FEDCBA98765432 /* ClaudeService.swift in Sources */,
+				DD98765432FEDCBA98765432 /* InsightsOverviewView.swift in Sources */,
+				EE98765432FEDCBA98765432 /* MetricsSettingsView.swift in Sources */,
 );
 			runOnlyForDeploymentPostprocessing = 0;
 		};

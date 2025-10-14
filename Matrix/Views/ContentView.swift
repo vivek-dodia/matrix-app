@@ -23,7 +23,7 @@ struct ContentView: View {
     @EnvironmentObject var appState: AppState
     @State private var showConfiguration = false
     @State private var showLogs = false
-    @State private var showMetricsOverview = false
+    @State private var showInsightsOverview = false
     @State private var showBabbleChat = false
     @State private var authorizationStatus = "Not Checked"
     @State private var isLoading = false
@@ -81,8 +81,8 @@ struct ContentView: View {
         .sheet(isPresented: $showLogs) {
             LogView()
         }
-        .sheet(isPresented: $showMetricsOverview) {
-            MetricsOverviewView()
+        .sheet(isPresented: $showInsightsOverview) {
+            InsightsOverviewView()
         }
         .sheet(isPresented: $showBabbleChat) {
             BabbleChatView()
@@ -166,17 +166,17 @@ struct ContentView: View {
                                 await MainActor.run {
                                     metricsCount = metrics.count
                                     updateMetricsCount()
-                                    showMetricsOverview = true
+                                    showInsightsOverview = true
                                 }
                             } catch {
                                 logger.log("Failed to collect metrics: \(error)", level: .error)
                                 await MainActor.run {
-                                    showMetricsOverview = true
+                                    showInsightsOverview = true
                                 }
                             }
                         }
                     } else {
-                        showMetricsOverview = true
+                        showInsightsOverview = true
                     }
                 }
         }

@@ -19,13 +19,47 @@ iPhone (Matrix App) → Pushgateway → Prometheus → Grafana
 
 ## Features
 
-- **Comprehensive HealthKit Integration**: Collects all available health metrics including steps, heart rate, workouts, sleep, and more
-- **Push Model Architecture**: Sends metrics to Prometheus Pushgateway (no inbound connections required)
+### Core Features
+- **Comprehensive HealthKit Integration**: Collects 60+ health metrics including:
+  - Activity & Movement (steps, distance, flights climbed, exercise time, stand time)
+  - Heart Metrics (heart rate, resting HR, walking HR, HRV)
+  - Energy & Calories (active energy, basal energy)
+  - Sleep Analysis
+  - Body Measurements (weight, BMI, body fat %)
+  - Vitals (blood oxygen, blood pressure, respiratory rate, body temperature)
+  - Mobility Metrics (walking speed, step length, walking steadiness, stair speed)
+  - Audio Exposure (environmental audio, headphone audio)
+  - Workouts (15+ activity types)
+  - Activity Rings (Move, Exercise, Stand)
+
+- **Push Model Architecture**: Sends metrics to Prometheus Pushgateway or InfluxDB (no inbound connections required)
 - **Background Operation**: Runs silently in the background with configurable push intervals
-- **Secure Credential Storage**: Basic auth credentials stored in iOS Keychain
-- **Minimal UI**: Simple setup button and configuration interface
+- **Secure Credential Storage**: Credentials stored in iOS Keychain
+
+### New UI Features
+- **Metrics Overview Screen**: Visual dashboard showing all your health metrics
+  - Individual metric cards with values, units, and timestamps
+  - Percentage change indicators (green/red)
+  - Sparkline charts for each metric
+  - Real-time sync status
+  - Customizable metric selection
+
+- **Metrics Configuration**: Choose which metrics to display
+  - 60+ available metrics to select from
+  - Select all / Deselect all option
+  - Organized by category (quantity, category, workout, activity)
+  - Visual checkboxes and sparklines
+
+- **Babble AI Assistant**: Chat with your health data
+  - Ask questions about your metrics
+  - Get correlations and insights
+  - 30-day historical data analysis
+  - Powered by Claude AI
+
+### Additional Features
 - **Built-in Logging**: Debug logs viewable within the app
 - **Status Notifications**: Periodic notifications about push status
+- **InfluxDB Support**: Alternative to Prometheus for time-series storage
 
 ## Setup Instructions
 
@@ -82,16 +116,26 @@ scrape_configs:
    - Trust the developer certificate on your iPhone if prompted
 
 3. **Initial Configuration**
-   - Tap "Setup Matrix" button
+   - Tap "Authorize" button
    - Grant all requested HealthKit permissions
-   - Enter your Pushgateway URL (e.g., `http://192.168.1.100:9091`)
+   - Tap "Configure" to access settings
+   - Choose between Prometheus or InfluxDB
+   - Enter your Pushgateway URL (e.g., `http://192.168.1.100:9091`) or InfluxDB credentials
    - Configure authentication if required
-   - Tap "Test" to verify connectivity
+   - Select which metrics to track in Metrics Configuration
 
 4. **Start Service**
-   - After successful setup, tap "Start Service"
+   - After successful setup, the service will auto-start
    - The app will begin pushing metrics every 5 minutes (configurable)
    - Disconnect USB cable - the app continues running in background
+
+5. **Using the App**
+   - **Main Screen**: Shows connection status and sync information
+   - **Metrics Overview**: Tap the center button to view all your health metrics
+   - **Metrics Settings**: Tap the gear icon in metrics view to configure which metrics to display
+   - **Babble Chat**: Tap "Babble" to chat with AI about your health data
+   - **Configuration**: Tap "Configure" to change settings
+   - **Logs**: Tap the log indicators to view system logs
 
 ### Grafana Setup
 

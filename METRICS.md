@@ -1,6 +1,6 @@
 # Matrix Health Metrics Reference
 
-This document lists all health metrics currently exported by the Matrix app from Apple HealthKit to Prometheus.
+This document lists all 60+ health metrics available in the Matrix app from Apple HealthKit. You can view these metrics in the app's Metrics Overview screen and configure which ones to display using the Metrics Settings.
 
 ## Metric Format
 
@@ -133,17 +133,124 @@ healthkit_workout_calories_total{job="my_health_data"} by (activity)
 - Group by `activity` label for workout breakdowns
 - Group by `source` label to compare devices
 
-## Future Metrics
+## All Available Metrics
 
-The following HealthKit data types are available but not yet implemented:
-- Heart Rate Variability (HRV)
-- Respiratory Rate
-- Body Temperature
-- Flights Climbed
-- Mindfulness Minutes
-- Stand Hours
-- Exercise Minutes
-- Nutrition Data
-- Water Intake
+### Activity & Movement (6 metrics)
+- **Steps** - Total steps taken
+- **Walking/Running Distance** - Distance covered walking or running
+- **Cycling Distance** - Distance covered cycling
+- **Flights Climbed** - Number of flights of stairs climbed
+- **Exercise Time** - Active exercise minutes (Apple Watch Exercise Ring)
+- **Stand Time** - Active standing minutes (Apple Watch Stand Ring)
 
-These can be added by extending the HealthKitManager class.
+### Heart Metrics (4 metrics)
+- **Heart Rate** - Current heart rate
+- **Resting Heart Rate** - Resting heart rate
+- **Walking Heart Rate** - Average heart rate during walking
+- **Heart Rate Variability (HRV)** - Heart rate variability measurement
+
+### Energy & Calories (2 metrics)
+- **Active Energy** - Calories burned through activity
+- **Basal Energy** - Resting metabolic rate calories
+
+### Sleep (1 metric)
+- **Sleep Analysis** - Total sleep duration
+
+### Respiratory & Vitals (7 metrics)
+- **Respiratory Rate** - Breaths per minute
+- **Blood Oxygen** - Oxygen saturation percentage
+- **Body Temperature** - Body temperature
+- **Blood Pressure (Systolic)** - Systolic blood pressure
+- **Blood Pressure (Diastolic)** - Diastolic blood pressure
+- **Blood Glucose** - Blood glucose levels
+
+### Body Measurements (5 metrics)
+- **Body Mass** - Body weight
+- **Body Mass Index (BMI)** - BMI calculation
+- **Body Fat %** - Body fat percentage
+- **Height** - Height measurement
+- **Waist Circumference** - Waist circumference
+
+### Metabolic (1 metric)
+- **VO2 Max** - Maximum oxygen consumption
+
+### Mobility & Gait (9 metrics)
+- **Walking Speed** - Average walking speed
+- **Walking Step Length** - Step length during walking
+- **Walking Double Support %** - Percentage of time both feet on ground
+- **Walking Asymmetry %** - Gait asymmetry percentage
+- **Walking Steadiness** - Walking stability score
+- **Stair Ascent Speed** - Speed climbing stairs
+- **Stair Descent Speed** - Speed descending stairs
+- **Six-Minute Walk Distance** - Distance covered in 6-minute walk test
+- **Physical Effort** - Physical effort rating (iOS 17+)
+
+### Audio & Environment (3 metrics)
+- **Environmental Audio Exposure** - Ambient sound exposure
+- **Headphone Audio Exposure** - Headphone volume exposure
+- **Environmental Sound Reduction** - Active noise reduction
+
+### Category Types (7 metrics)
+- **Stand Hour** - Stand hour events
+- **Mindful Session** - Mindfulness minutes
+- **High Heart Rate Event** - High heart rate alerts
+- **Low Heart Rate Event** - Low heart rate alerts
+- **Irregular Heart Rhythm** - Irregular rhythm notifications
+- **Toothbrushing** - Toothbrushing events
+- **Audio Exposure Events** - Audio exposure limit events
+
+### Workout Types (15+ metrics)
+- **Walking Workout** - Walking workout sessions
+- **Running Workout** - Running workout sessions
+- **Cycling Workout** - Cycling workout sessions
+- **Swimming Workout** - Swimming workout sessions
+- **Strength Training** - Traditional strength training
+- **Functional Training** - Functional strength training
+- **HIIT Workout** - High-intensity interval training
+- **Yoga** - Yoga sessions
+- **Core Training** - Core workout sessions
+- **Flexibility** - Flexibility/stretching sessions
+- **Cooldown** - Cooldown sessions
+- **Elliptical** - Elliptical machine workouts
+- **Rowing** - Rowing machine workouts
+- **Stair Climbing** - Stair stepper workouts
+- **Other Workouts** - Other activity types
+
+### Activity Summary (3 metrics)
+- **Move Ring Progress** - Daily move goal progress
+- **Exercise Ring Progress** - Daily exercise goal progress
+- **Stand Ring Progress** - Daily stand goal progress
+
+## Metrics Overview Screen
+
+The app includes a visual metrics dashboard accessible by tapping the center button on the main screen:
+
+- **Individual Metric Cards**: Each metric displays:
+  - Current value with unit
+  - Percentage change indicator (green for improvement, red for decrease)
+  - Mini sparkline chart showing trend
+  - Time since last update
+
+- **Summary Statistics**: Shows count of improving vs tracked metrics
+- **Real-time Sync**: Displays last sync time with HealthKit
+- **Customization**: Tap gear icon to configure which metrics to display
+
+## Metrics Configuration
+
+Access via gear icon in Metrics Overview screen:
+
+- **Select Metrics**: Choose from 60+ available metrics
+- **Select All / Deselect All**: Bulk selection options
+- **Visual Preview**: See sparklines and percentage changes for each metric
+- **Organized Categories**: Metrics grouped by type for easy navigation
+- **Persistent Settings**: Selections saved between app launches
+
+## Using Babble AI Assistant
+
+Ask natural language questions about your health data:
+- "What's my average heart rate this week?"
+- "Correlate my sleep and exercise"
+- "How can I improve my sleep?"
+- "Analyze my exercise patterns"
+
+Babble has access to 30 days of historical data and can identify trends, correlations, and provide insights.
