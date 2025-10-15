@@ -23,7 +23,7 @@ struct ContentView: View {
     @EnvironmentObject var appState: AppState
     @State private var showConfiguration = false
     @State private var showLogs = false
-    @State private var showInsightsOverview = false
+    @State private var showMetricsOverview = false
     @State private var showBabbleChat = false
     @State private var authorizationStatus = "Not Checked"
     @State private var isLoading = false
@@ -81,8 +81,8 @@ struct ContentView: View {
         .sheet(isPresented: $showLogs) {
             LogView()
         }
-        .sheet(isPresented: $showInsightsOverview) {
-            InsightsOverviewView()
+        .sheet(isPresented: $showMetricsOverview) {
+            MetricsOverviewView()
         }
         .sheet(isPresented: $showBabbleChat) {
             BabbleChatView()
@@ -155,29 +155,8 @@ struct ContentView: View {
                 .frame(width: 64, height: 64)
                 .scaleEffect(centralCircleScale())
                 .onTapGesture {
-                    // Force collect metrics before showing
-                    if appState.isHealthKitAuthorized {
-                        Task {
-                            do {
-                                logger.log("Manually collecting metrics...", level: .info)
-                                let metrics = try await healthKitManager.collectAllMetrics()
-                                logger.log("Collected \(metrics.count) metrics", level: .info)
-
-                                await MainActor.run {
-                                    metricsCount = metrics.count
-                                    updateMetricsCount()
-                                    showInsightsOverview = true
-                                }
-                            } catch {
-                                logger.log("Failed to collect metrics: \(error)", level: .error)
-                                await MainActor.run {
-                                    showInsightsOverview = true
-                                }
-                            }
-                        }
-                    } else {
-                        showInsightsOverview = true
-                    }
+                    // Open AI chat when center dot is tapped
+                    showBabbleChat = true
                 }
         }
         .frame(width: 256, height: 256)
@@ -306,13 +285,35 @@ struct ContentView: View {
             
             Spacer()
 
-            // Babble and Configure buttons
+            // Metrics and Configure buttons
             HStack(spacing: 12) {
-                // Babble button
+                // Metrics button (formerly Babble)
                 Button(action: {
-                    showBabbleChat = true
+                    // Force collect metrics before showing
+                    if appState.isHealthKitAuthorized {
+                        Task {
+                            do {
+                                logger.log("Manually collecting metrics...", level: .info)
+                                let metrics = try await healthKitManager.collectAllMetrics()
+                                logger.log("Collected \(metrics.count) metrics", level: .info)
+
+                                await MainActor.run {
+                                    metricsCount = metrics.count
+                                    updateMetricsCount()
+                                    showMetricsOverview = true
+                                }
+                            } catch {
+                                logger.log("Failed to collect metrics: \(error)", level: .error)
+                                await MainActor.run {
+                                    showMetricsOverview = true
+                                }
+                            }
+                        }
+                    } else {
+                        showMetricsOverview = true
+                    }
                 }) {
-                    Text("Babble")
+                    Text("Metrics")
                         .monospacedFont(size: 14, weight: .medium)
                         .foregroundColor(.matrixPrimaryText)
                         .padding(.horizontal, 20)

@@ -98,13 +98,41 @@ class HealthKitManager {
             .environmentalAudioExposure,
             .headphoneAudioExposure,
             .appleWalkingSteadiness,
-            .environmentalSoundReduction
+            .environmentalSoundReduction,
+            // Dietary metrics
+            .dietaryEnergyConsumed,
+            .dietaryWater,
+            .dietaryCaffeine,
+            .dietaryProtein,
+            .dietaryCarbohydrates,
+            .dietaryFatTotal
         ]
         
         // iOS 17.0+ only metrics
         if #available(iOS 17.0, *) {
             quantityTypes.append(.physicalEffort)
         }
+        
+        // iOS 18.0+ only metrics - Enable when SDK supports them
+        #if swift(>=6.0) // Swift 6.0+ typically comes with newer SDKs
+        if #available(iOS 18.0, *) {
+            // Conditionally add iOS 18+ metrics if they exist
+            let ios18Metrics: [(HKQuantityTypeIdentifier, String)] = [
+                // Uncomment when SDK is updated:
+                // (.timeInDaylight, "timeInDaylight"),
+                // (.cyclingPower, "cyclingPower"),
+                // (.cyclingSpeed, "cyclingSpeed"),
+                // (.cyclingCadence, "cyclingCadence"),
+                // (.underwaterDepth, "underwaterDepth")
+            ]
+            
+            for (identifier, _) in ios18Metrics {
+                if let type = HKQuantityType.quantityType(forIdentifier: identifier) {
+                    quantityTypes.append(identifier)
+                }
+            }
+        }
+        #endif
         
         for identifier in quantityTypes {
             if let type = HKQuantityType.quantityType(forIdentifier: identifier) {
@@ -113,7 +141,7 @@ class HealthKitManager {
         }
         
         // Category types - ALL from healthkit_types.json
-        let categoryTypes: [HKCategoryTypeIdentifier] = [
+        var categoryTypes: [HKCategoryTypeIdentifier] = [
             .sleepAnalysis,
             .appleStandHour,
             .mindfulSession,
@@ -122,8 +150,32 @@ class HealthKitManager {
             .irregularHeartRhythmEvent,
             .environmentalAudioExposureEvent,
             .headphoneAudioExposureEvent,
-            .toothbrushingEvent
+            .toothbrushingEvent,
+            // Additional useful category types
+            .sexualActivity,
+            .intermenstrualBleeding,
+            .menstrualFlow,
+            .cervicalMucusQuality,
+            .ovulationTestResult,
+            .pregnancyTestResult
         ]
+        
+        // iOS 18.0+ category types - Enable when SDK supports them  
+        #if swift(>=6.0) // Swift 6.0+ typically comes with newer SDKs
+        if #available(iOS 18.0, *) {
+            // Conditionally add iOS 18+ category types if they exist
+            let ios18Categories: [HKCategoryTypeIdentifier] = [
+                // Uncomment when SDK is updated:
+                // .stateOfMind
+            ]
+            
+            for identifier in ios18Categories {
+                if let type = HKCategoryType.categoryType(forIdentifier: identifier) {
+                    categoryTypes.append(identifier)
+                }
+            }
+        }
+        #endif
         
         for identifier in categoryTypes {
             if let type = HKCategoryType.categoryType(forIdentifier: identifier) {
@@ -471,13 +523,32 @@ class HealthKitManager {
             // Audio exposure metrics
             (.environmentalAudioExposure, "environmental_audio_exposure_db", .gauge),
             (.headphoneAudioExposure, "headphone_audio_exposure_db", .gauge),
-            (.environmentalSoundReduction, "environmental_sound_reduction_db", .gauge)
+            (.environmentalSoundReduction, "environmental_sound_reduction_db", .gauge),
+            
+            // Additional health metrics that may be missing
+            (.dietaryEnergyConsumed, "dietary_energy_consumed_calories", .counter),
+            (.dietaryWater, "dietary_water_ml", .counter),
+            (.dietaryCaffeine, "dietary_caffeine_mg", .counter),
+            (.dietaryProtein, "dietary_protein_grams", .counter),
+            (.dietaryCarbohydrates, "dietary_carbohydrates_grams", .counter),
+            (.dietaryFatTotal, "dietary_fat_total_grams", .counter)
         ]
         
         // iOS 17.0+ only metrics
         if #available(iOS 17.0, *) {
             quantityTypes.append((.physicalEffort, "physical_effort_kcal_hr_kg", .gauge))
         }
+        
+        // iOS 18.0+ only metrics (commented out until SDK supports them)
+        // if #available(iOS 18.0, *) {
+        //     quantityTypes.append(contentsOf: [
+        //         (.timeInDaylight, "time_in_daylight_minutes", .counter),
+        //         (.cyclingPower, "cycling_power_watts", .gauge),
+        //         (.cyclingSpeed, "cycling_speed_m_per_s", .gauge),
+        //         (.cyclingCadence, "cycling_cadence_rpm", .gauge),
+        //         (.underwaterDepth, "underwater_depth_meters", .gauge)
+        //     ])
+        // }
         
         for (identifier, metricName, metricType) in quantityTypes {
             guard let quantityType = HKQuantityType.quantityType(forIdentifier: identifier) else { continue }
@@ -908,11 +979,40 @@ class HealthKitManager {
         case .environmentalAudioExposure, .headphoneAudioExposure, .environmentalSoundReduction:
             return .decibelAWeightedSoundPressureLevel()
             
+        // Dietary metrics
+        case .dietaryEnergyConsumed:
+            return .kilocalorie()
+        case .dietaryWater:
+            return .literUnit(with: .milli)
+        case .dietaryCaffeine:
+            return .gramUnit(with: .milli)
+        case .dietaryProtein, .dietaryCarbohydrates, .dietaryFatTotal:
+            return .gram()
+            
         default:
             // Physical effort (kcal/hr·kg) - iOS 17.0+ only
             if #available(iOS 17.0, *), identifier == .physicalEffort {
                 return .kilocalorie().unitDivided(by: .hour()).unitDivided(by: .gramUnit(with: .kilo))
             }
+            
+            // iOS 18.0+ metrics (commented out until SDK supports them)
+            // if #available(iOS 18.0, *) {
+            //     switch identifier {
+            //     case .timeInDaylight:
+            //         return .minute()
+            //     case .cyclingPower:
+            //         return .watt()
+            //     case .cyclingSpeed:
+            //         return .meter().unitDivided(by: .second())
+            //     case .cyclingCadence:
+            //         return .count().unitDivided(by: .minute()) // RPM
+            //     case .underwaterDepth:
+            //         return .meter()
+            //     default:
+            //         break
+            //     }
+            // }
+            
             return .count()
         }
     }
